@@ -76,7 +76,7 @@ pub fn encode_observation(state: &GameState, player_idx: usize) -> Vec<f32> {
     obs[offset] = opponent.hand.len() as f32 / 10.0;
     offset += 1;
     obs[offset] = opponent.deck.len() as f32 / 20.0;
-    offset += 1;
+    // offset += 1;
 
     obs
 }

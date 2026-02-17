@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::mechanics::*;
-use crate::data::card::{Card, EnergyType};
+use crate::data::card::Card;
 use crate::game::state::StatusCondition;
 
 /// Registry mapping card effect text to structured mechanics.

@@ -1,4 +1,4 @@
-use crate::data::card::{Card, EnergyType};
+use crate::data::card::Card;
 use crate::data::deck::Deck;
 use crate::game::actions::Action;
 use crate::game::rng::GameRng;
@@ -81,7 +81,7 @@ pub fn apply_action(state: &mut GameState, action: &Action, rng: &mut GameRng) -
     }
 }
 
-fn apply_setup_action(state: &mut GameState, action: &Action, rng: &mut GameRng) -> StepResult {
+fn apply_setup_action(state: &mut GameState, action: &Action, _rng: &mut GameRng) -> StepResult {
     match action {
         Action::PlaceActive(hand_idx) => {
             let player = &mut state.players[state.current_player];
@@ -262,7 +262,7 @@ fn apply_main_action(state: &mut GameState, action: &Action, rng: &mut GameRng) 
     }
 }
 
-fn apply_effect_choice(state: &mut GameState, action: &Action, rng: &mut GameRng) -> StepResult {
+fn apply_effect_choice(state: &mut GameState, action: &Action, _rng: &mut GameRng) -> StepResult {
     match (&state.pending_choice, action) {
         (Some(PendingChoice::PromoteFromBench), Action::PromotePokemon(bench_idx)) => {
             let player = state.current_mut();

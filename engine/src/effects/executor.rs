@@ -47,14 +47,11 @@ pub fn execute_mechanic(state: &mut GameState, mechanic: &Mechanic, rng: &mut Ga
             }
         }
 
-        Mechanic::DamageOnCoinFlip(damage) => {
+        Mechanic::DamageOnCoinFlip(_damage) => {
             // If tails, negate the attack damage (handled at attack resolution level)
+            // TODO: integrate with attack resolution system for damage negation
             if !rng.coin_flip() {
-                // Set a flag to negate damage
-                if let Some(ref mut active) = state.players[opponent].active {
-                    // We can't easily negate damage here; this needs integration
-                    // with the attack resolution system
-                }
+                // Tails - attack does no damage
             }
         }
 
