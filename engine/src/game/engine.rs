@@ -1,5 +1,8 @@
-use crate::data::card::Card;
+use crate::data::card::{Card, CardType};
 use crate::data::deck::Deck;
+use crate::effects::executor::{execute_attack_effects, execute_mechanic};
+use crate::effects::mechanics::Mechanic;
+use crate::effects::registry::EffectRegistry;
 use crate::game::actions::Action;
 use crate::game::rng::GameRng;
 use crate::game::state::*;
@@ -72,10 +75,15 @@ fn ensure_basic_in_hand(player: &mut PlayerState, rng: &mut GameRng) {
 }
 
 /// Apply an action to the game state.
-pub fn apply_action(state: &mut GameState, action: &Action, rng: &mut GameRng) -> StepResult {
+pub fn apply_action(
+    state: &mut GameState,
+    action: &Action,
+    rng: &mut GameRng,
+    registry: &EffectRegistry,
+) -> StepResult {
     match state.phase {
         TurnPhase::Setup => apply_setup_action(state, action, rng),
-        TurnPhase::Main => apply_main_action(state, action, rng),
+        TurnPhase::Main => apply_main_action(state, action, rng, registry),
         TurnPhase::EffectChoice => apply_effect_choice(state, action, rng),
         _ => StepResult::InvalidAction(format!("Cannot act in phase {:?}", state.phase)),
     }
@@ -124,7 +132,12 @@ fn apply_setup_action(state: &mut GameState, action: &Action, _rng: &mut GameRng
     }
 }
 
-fn apply_main_action(state: &mut GameState, action: &Action, rng: &mut GameRng) -> StepResult {
+fn apply_main_action(
+    state: &mut GameState,
+    action: &Action,
+    rng: &mut GameRng,
+    registry: &EffectRegistry,
+) -> StepResult {
     match action {
         Action::PlayPokemonToBench(hand_idx) => {
             let turn = state.turn_number;
@@ -224,10 +237,21 @@ fn apply_main_action(state: &mut GameState, action: &Action, rng: &mut GameRng) 
         }
 
         Action::UseAbility(board_pos) => {
-            // TODO: implement ability effects in effects module
-            let player = state.current_mut();
-            if let Some(pokemon) = player.get_pokemon_mut(*board_pos) {
-                pokemon.temp_flags.used_ability = true;
+            let card_id = {
+                let player = state.current_mut();
+                let id = player
+                    .get_pokemon(*board_pos)
+                    .map(|p| p.card.id.clone());
+                if let Some(pokemon) = player.get_pokemon_mut(*board_pos) {
+                    pokemon.temp_flags.used_ability = true;
+                }
+                id
+            };
+            if let Some(id) = card_id {
+                let effects = registry.get_ability_effects(&id).to_vec();
+                for mechanic in &effects {
+                    execute_mechanic(state, mechanic, rng);
+                }
             }
             StepResult::Continue
         }
@@ -241,8 +265,40 @@ fn apply_main_action(state: &mut GameState, action: &Action, rng: &mut GameRng) 
             if matches!(action, Action::PlaySupporter(_)) {
                 player.supporter_played = true;
             }
-            // TODO: execute trainer effects in effects module
-            player.discard.push(card);
+
+            // For Tool cards: attach to active Pokemon (simplified)
+            if card.card_type == CardType::Tool {
+                if let Some(ref mut active) = state.current_mut().active {
+                    if active.tool.is_none() {
+                        active.tool = Some(card);
+                    } else {
+                        // Already has a tool, discard this one
+                        state.current_mut().discard.push(card);
+                    }
+                } else {
+                    state.current_mut().discard.push(card);
+                }
+                return StepResult::Continue;
+            }
+
+            // Execute trainer effects
+            let card_id = card.id.clone();
+            let effects = registry.get_trainer_effects(&card_id).to_vec();
+            state.current_mut().discard.push(card);
+
+            let mut force_end_turn = false;
+            for mechanic in &effects {
+                if matches!(mechanic, Mechanic::EndTurn) {
+                    force_end_turn = true;
+                    continue;
+                }
+                execute_mechanic(state, mechanic, rng);
+            }
+
+            if force_end_turn {
+                end_turn(state, rng, registry);
+            }
+
             StepResult::Continue
         }
 
@@ -250,11 +306,11 @@ fn apply_main_action(state: &mut GameState, action: &Action, rng: &mut GameRng) 
             if state.first_turn {
                 return StepResult::InvalidAction("Cannot attack on first turn".into());
             }
-            return resolve_attack(state, *attack_idx, rng);
+            return resolve_attack(state, *attack_idx, rng, registry);
         }
 
         Action::EndTurn => {
-            end_turn(state, rng);
+            end_turn(state, rng, registry);
             StepResult::Continue
         }
 
@@ -283,35 +339,59 @@ fn apply_effect_choice(state: &mut GameState, action: &Action, _rng: &mut GameRn
 }
 
 /// Resolve an attack.
-fn resolve_attack(state: &mut GameState, attack_idx: usize, rng: &mut GameRng) -> StepResult {
+fn resolve_attack(
+    state: &mut GameState,
+    attack_idx: usize,
+    rng: &mut GameRng,
+    registry: &EffectRegistry,
+) -> StepResult {
     let current_player = state.current_player;
     let opponent_idx = 1 - current_player;
 
-    // Get attack data
-    let attack = {
+    // Get attack data and card ID
+    let (attack, card_id) = {
         let active = match state.players[current_player].active {
             Some(ref a) => a,
             None => return StepResult::InvalidAction("No active Pokemon".into()),
         };
         match active.card.attacks.get(attack_idx) {
-            Some(a) => a.clone(),
+            Some(a) => (a.clone(), active.card.id.clone()),
             None => return StepResult::InvalidAction("Invalid attack index".into()),
         }
     };
 
-    // Calculate base damage
-    let mut damage = attack.damage;
+    // Execute pre-damage effects (coin flips, conditional damage, etc.)
+    let damage_modifier = execute_attack_effects(state, registry, &card_id, attack_idx, rng);
+
+    // Calculate base damage (may be overridden by effects)
+    let mut damage = match damage_modifier {
+        Some(override_dmg) => {
+            // Effects like DamagePerCoinFlip replace base damage entirely
+            // But ConditionalDamage adds a bonus to the base
+            if attack.damage > 0 && override_dmg > 0 {
+                // If both base and modifier exist, it's a bonus
+                attack.damage + override_dmg
+            } else if override_dmg > 0 {
+                override_dmg
+            } else {
+                0 // Coin flip tails = no damage
+            }
+        }
+        None => attack.damage,
+    };
 
     // Apply weakness
-    if let Some(ref opponent_active) = state.players[opponent_idx].active {
-        if let Some(weakness) = opponent_active.card.weakness {
-            if let Some(attacker_type) = state.players[current_player]
-                .active
-                .as_ref()
-                .and_then(|a| a.card.energy_type)
-            {
-                if attacker_type == weakness {
-                    damage += 20;
+    if damage > 0 {
+        if let Some(ref opponent_active) = state.players[opponent_idx].active {
+            if let Some(weakness) = opponent_active.card.weakness {
+                if let Some(attacker_type) = state.players[current_player]
+                    .active
+                    .as_ref()
+                    .and_then(|a| a.card.energy_type)
+                {
+                    if attacker_type == weakness {
+                        damage += 20;
+                    }
                 }
             }
         }
@@ -322,18 +402,78 @@ fn resolve_attack(state: &mut GameState, attack_idx: usize, rng: &mut GameRng) -
         damage += active.temp_flags.bonus_damage;
     }
 
-    // Apply damage prevention on defender
-    if let Some(ref opponent_active) = state.players[opponent_idx].active {
-        let prevent = opponent_active.temp_flags.prevent_damage_amount;
-        damage = damage.saturating_sub(prevent);
+    // Apply passive tool damage boost (Beastite)
+    if let Some(ref active) = state.players[current_player].active {
+        if let Some(ref tool) = active.tool {
+            for mechanic in registry.get_tool_effects(&tool.id) {
+                if let Mechanic::DamageBoostPerPoint { per } = mechanic {
+                    damage += per * state.players[current_player].points;
+                }
+                if let Mechanic::PassiveDamageBoost { amount } = mechanic {
+                    damage += amount;
+                }
+            }
+        }
     }
 
-    // TODO: Apply attack effects (effects module will handle this)
+    // Apply damage prevention on defender
+    if let Some(ref opponent_active) = state.players[opponent_idx].active {
+        let mut prevent = opponent_active.temp_flags.prevent_damage_amount;
+
+        // Check defender's tool for damage reduction
+        if let Some(ref tool) = opponent_active.tool {
+            for mechanic in registry.get_tool_effects(&tool.id) {
+                if let Mechanic::PassiveDamageReduction { amount } = mechanic {
+                    prevent += amount;
+                }
+            }
+        }
+
+        // Check defender's ability for passive damage reduction
+        if let Some(ref ability) = opponent_active.card.ability {
+            let _ = ability; // use card_id for lookup
+            for mechanic in registry.get_ability_effects(&opponent_active.card.id) {
+                if let Mechanic::PassiveDamageReduction { amount } = mechanic {
+                    prevent += amount;
+                }
+            }
+        }
+
+        damage = damage.saturating_sub(prevent);
+    }
 
     // Deal damage to opponent's active Pokemon
     if damage > 0 {
         if let Some(ref mut target) = state.players[opponent_idx].active {
             target.damage_counters += damage / 10;
+        }
+    }
+
+    // Check tool retaliation effects on defender
+    if damage > 0 {
+        if let Some(ref opponent_active) = state.players[opponent_idx].active {
+            if let Some(ref tool) = opponent_active.tool {
+                let tool_effects = registry.get_tool_effects(&tool.id).to_vec();
+                for mechanic in &tool_effects {
+                    match mechanic {
+                        Mechanic::RetaliationDamage { amount } => {
+                            if let Some(ref mut attacker) =
+                                state.players[current_player].active
+                            {
+                                attacker.damage_counters += amount / 10;
+                            }
+                        }
+                        Mechanic::RetaliationStatus { status } => {
+                            if let Some(ref mut attacker) =
+                                state.players[current_player].active
+                            {
+                                attacker.apply_status(*status);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+            }
         }
     }
 
@@ -344,11 +484,11 @@ fn resolve_attack(state: &mut GameState, attack_idx: usize, rng: &mut GameRng) -
         .map_or(false, |p| p.is_knocked_out());
 
     if ko {
-        handle_knockout(state, opponent_idx);
+        handle_knockout(state, opponent_idx, registry);
     }
 
     // End the turn
-    end_turn(state, rng);
+    end_turn(state, rng, registry);
 
     // Check win conditions
     check_win_conditions(state);
@@ -361,7 +501,7 @@ fn resolve_attack(state: &mut GameState, attack_idx: usize, rng: &mut GameRng) -
 }
 
 /// Handle a Pokemon being knocked out.
-fn handle_knockout(state: &mut GameState, knocked_out_player: usize) {
+fn handle_knockout(state: &mut GameState, knocked_out_player: usize, registry: &EffectRegistry) {
     let attacker = 1 - knocked_out_player;
 
     // Move KO'd Pokemon to discard
@@ -369,10 +509,67 @@ fn handle_knockout(state: &mut GameState, knocked_out_player: usize) {
         let points = if ko_pokemon.card.is_ex { 2 } else { 1 };
         state.players[attacker].points += points;
 
-        // Discard the KO'd Pokemon and all attached cards
-        state.players[knocked_out_player].discard.push(ko_pokemon.card);
-        // Also discard the pre-evolution chain
-        // (simplified: just discard the top-level card)
+        // Check KO'd Pokemon's tool for on-KO effects
+        let mut bounce_to_hand = false;
+        let mut move_energy_count = 0u32;
+        if let Some(ref tool) = ko_pokemon.tool {
+            for mechanic in registry.get_tool_effects(&tool.id) {
+                match mechanic {
+                    Mechanic::OnKOBounceToHand => {
+                        bounce_to_hand = true;
+                    }
+                    Mechanic::OnKOMoveEnergy { count } => {
+                        move_energy_count = *count;
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        // Check attacker's tool for on-KO-opponent effects
+        if let Some(ref active) = state.players[attacker].active {
+            if let Some(ref tool) = active.tool {
+                for mechanic in registry.get_tool_effects(&tool.id) {
+                    if matches!(mechanic, Mechanic::OnKODrawCard) {
+                        // Draw a card for the attacker
+                        if let Some(card) = state.players[attacker].deck.pop() {
+                            state.players[attacker].hand.push(card);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Move energy to bench before discarding (OnKOMoveEnergy)
+        if move_energy_count > 0 {
+            let mut energies = ko_pokemon.attached_energy.clone();
+            let bench_slots: Vec<usize> = state.players[knocked_out_player]
+                .bench
+                .iter()
+                .enumerate()
+                .filter(|(_, b)| b.is_some())
+                .map(|(i, _)| i)
+                .collect();
+
+            let mut slot_idx = 0;
+            for energy in energies.drain(..) {
+                if slot_idx >= move_energy_count as usize || bench_slots.is_empty() {
+                    break;
+                }
+                let target = bench_slots[slot_idx % bench_slots.len()];
+                if let Some(ref mut pokemon) = state.players[knocked_out_player].bench[target] {
+                    pokemon.attached_energy.push(energy);
+                }
+                slot_idx += 1;
+            }
+        }
+
+        if bounce_to_hand {
+            // Return to hand instead of discard
+            state.players[knocked_out_player].hand.push(ko_pokemon.card);
+        } else {
+            state.players[knocked_out_player].discard.push(ko_pokemon.card);
+        }
     }
 
     // If the KO'd player has bench Pokemon, they must promote one
@@ -401,9 +598,9 @@ fn handle_knockout(state: &mut GameState, knocked_out_player: usize) {
 }
 
 /// End the current turn and start the next.
-fn end_turn(state: &mut GameState, rng: &mut GameRng) {
+fn end_turn(state: &mut GameState, rng: &mut GameRng, registry: &EffectRegistry) {
     // Resolve between-turns effects
-    resolve_between_turns(state, rng);
+    resolve_between_turns(state, rng, registry);
 
     // Switch to next player
     state.current_player = 1 - state.current_player;
@@ -423,7 +620,7 @@ fn end_turn(state: &mut GameState, rng: &mut GameRng) {
 }
 
 /// Resolve between-turns effects (poison, burn, etc.).
-fn resolve_between_turns(state: &mut GameState, rng: &mut GameRng) {
+fn resolve_between_turns(state: &mut GameState, rng: &mut GameRng, registry: &EffectRegistry) {
     let current = state.current_player;
 
     // Status effects on the current player's active Pokemon
@@ -451,6 +648,23 @@ fn resolve_between_turns(state: &mut GameState, rng: &mut GameRng) {
         active
             .status_conditions
             .retain(|s| *s != StatusCondition::Paralyzed);
+
+        // Tool passive effects (between turns)
+        if let Some(ref tool) = active.tool {
+            let tool_effects = registry.get_tool_effects(&tool.id).to_vec();
+            for mechanic in &tool_effects {
+                match mechanic {
+                    Mechanic::HealBetweenTurns { amount } => {
+                        let heal = (*amount / 10).min(active.damage_counters);
+                        active.damage_counters -= heal;
+                    }
+                    Mechanic::CureStatusBetweenTurns => {
+                        active.clear_status();
+                    }
+                    _ => {}
+                }
+            }
+        }
     }
 
     // Check if status damage KO'd the active Pokemon
@@ -460,7 +674,7 @@ fn resolve_between_turns(state: &mut GameState, rng: &mut GameRng) {
         .map_or(false, |p| p.is_knocked_out());
 
     if ko {
-        handle_knockout(state, current);
+        handle_knockout(state, current, registry);
     }
 }
 

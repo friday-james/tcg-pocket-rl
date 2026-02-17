@@ -6,6 +6,7 @@ use crate::bridge::action_map::{action_mask, action_to_index, index_to_action, A
 use crate::bridge::observation::{encode_observation, OBS_SIZE};
 use crate::data::deck::Deck;
 use crate::data::loader::{load_card_database, CardDatabase};
+use crate::effects::registry::EffectRegistry;
 use crate::game::actions::legal_actions;
 use crate::game::engine::{apply_action, new_game, StepResult};
 use crate::game::rng::GameRng;
@@ -15,6 +16,7 @@ use crate::game::state::GameState;
 #[pyclass]
 pub struct PyGameEngine {
     db: CardDatabase,
+    registry: EffectRegistry,
     state: Option<GameState>,
     rng: Option<GameRng>,
     /// Which player the agent controls (0 or 1).
@@ -28,8 +30,11 @@ impl PyGameEngine {
     fn new(cards_json_path: &str) -> PyResult<Self> {
         let db = load_card_database(Path::new(cards_json_path))
             .map_err(|e| PyValueError::new_err(e))?;
+        let mut registry = EffectRegistry::new();
+        registry.register_cards(&db.cards);
         Ok(PyGameEngine {
             db,
+            registry,
             state: None,
             rng: None,
             agent_player: 0,
@@ -67,7 +72,7 @@ impl PyGameEngine {
                 .ok_or_else(|| PyValueError::new_err("Game not initialized. Call reset() first."))?;
             let rng = self.rng.as_mut().unwrap();
 
-            let result = apply_action(state, &action, rng);
+            let result = apply_action(state, &action, rng, &self.registry);
 
             match result {
                 StepResult::Continue => (0.0, false),

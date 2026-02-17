@@ -5,18 +5,29 @@ use rand::{Rng, SeedableRng};
 #[derive(Debug, Clone)]
 pub struct GameRng {
     rng: StdRng,
+    guaranteed_heads: bool,
 }
 
 impl GameRng {
     pub fn new(seed: u64) -> Self {
         GameRng {
             rng: StdRng::seed_from_u64(seed),
+            guaranteed_heads: false,
         }
     }
 
     /// Flip a coin. Returns true for heads, false for tails.
     pub fn coin_flip(&mut self) -> bool {
+        if self.guaranteed_heads {
+            self.guaranteed_heads = false;
+            return true;
+        }
         self.rng.gen_bool(0.5)
+    }
+
+    /// Set guaranteed heads for next coin flip (Will supporter effect).
+    pub fn set_guaranteed_heads(&mut self, value: bool) {
+        self.guaranteed_heads = value;
     }
 
     /// Flip a coin multiple times, return number of heads.
@@ -35,8 +46,11 @@ impl GameRng {
     }
 
     /// Generate a random number in range [0, max).
-    pub fn gen_range(&mut self, max: usize) -> usize {
-        self.rng.gen_range(0..max)
+    pub fn gen_range(&mut self, min: usize, max: usize) -> usize {
+        if min >= max {
+            return min;
+        }
+        self.rng.gen_range(min..max)
     }
 }
 

@@ -4,6 +4,7 @@ use rand::{Rng, SeedableRng};
 use tcg_pocket_engine::data::card::*;
 use tcg_pocket_engine::data::deck::Deck;
 use tcg_pocket_engine::data::loader::{load_card_database, load_cards};
+use tcg_pocket_engine::effects::registry::EffectRegistry;
 use tcg_pocket_engine::game::actions::{legal_actions, Action};
 use tcg_pocket_engine::game::engine::{apply_action, new_game, StepResult};
 use tcg_pocket_engine::game::state::TurnPhase;
@@ -131,6 +132,7 @@ fn test_setup_phase() {
     let deck1 = make_test_deck();
     let deck2 = make_test_deck();
     let (mut state, mut rng) = new_game(deck1, deck2, 42);
+    let registry = EffectRegistry::new();
 
     // Player 0 must place active first
     let actions = legal_actions(&state);
@@ -139,7 +141,7 @@ fn test_setup_phase() {
 
     // Place first basic as active
     let place = actions[0].clone();
-    let result = apply_action(&mut state, &place, &mut rng);
+    let result = apply_action(&mut state, &place, &mut rng, &registry);
     assert!(matches!(result, StepResult::Continue));
     assert!(state.players[0].active.is_some());
 
@@ -148,14 +150,14 @@ fn test_setup_phase() {
     assert!(actions.contains(&Action::ConfirmSetup));
 
     // Confirm setup for player 0
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
     assert_eq!(state.current_player, 1);
 
     // Player 1 setup
     let actions = legal_actions(&state);
     let place = actions[0].clone();
-    apply_action(&mut state, &place, &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &place, &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
 
     // Game should now be in Main phase
     assert_eq!(state.phase, TurnPhase::Main);
@@ -166,6 +168,7 @@ fn test_setup_phase() {
 fn test_random_game_completes() {
     use rand::Rng;
 
+    let registry = EffectRegistry::new();
     for seed in 0..20 {
         let deck1 = make_test_deck();
         let deck2 = make_test_deck();
@@ -183,7 +186,7 @@ fn test_random_game_completes() {
 
             let action_idx = prng.gen_range(0..actions.len());
             let action = actions[action_idx].clone();
-            apply_action(&mut state, &action, &mut rng);
+            apply_action(&mut state, &action, &mut rng, &registry);
             steps += 1;
         }
 
@@ -211,14 +214,15 @@ fn test_energy_attachment() {
     let deck1 = make_test_deck();
     let deck2 = make_test_deck();
     let (mut state, mut rng) = new_game(deck1, deck2, 42);
+    let registry = EffectRegistry::new();
 
     // Setup both players
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
 
     // Main phase - set energy zone type
     assert_eq!(state.phase, TurnPhase::Main);
@@ -226,6 +230,7 @@ fn test_energy_attachment() {
         &mut state,
         &Action::SetEnergyZoneType(EnergyType::Lightning),
         &mut rng,
+        &registry,
     );
 
     assert_eq!(
@@ -234,7 +239,7 @@ fn test_energy_attachment() {
     );
 
     // Attach energy to active
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
     assert!(state.players[0].energy_generated);
     assert_eq!(
         state.players[0]
@@ -247,7 +252,7 @@ fn test_energy_attachment() {
     );
 
     // Can't attach energy again
-    let result = apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
+    let result = apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
     assert!(matches!(result, StepResult::InvalidAction(_)));
 }
 
@@ -256,36 +261,39 @@ fn test_attack_deals_damage() {
     let deck1 = make_test_deck();
     let deck2 = make_test_deck();
     let (mut state, mut rng) = new_game(deck1, deck2, 42);
+    let registry = EffectRegistry::new();
 
     // Setup
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
 
     // End turn for player 0 (can't attack on first turn)
     apply_action(
         &mut state,
         &Action::SetEnergyZoneType(EnergyType::Fire),
         &mut rng,
+        &registry,
     );
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
-    apply_action(&mut state, &Action::EndTurn, &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
+    apply_action(&mut state, &Action::EndTurn, &mut rng, &registry);
 
     // Player 1 turn - set energy and end turn
     apply_action(
         &mut state,
         &Action::SetEnergyZoneType(EnergyType::Fire),
         &mut rng,
+        &registry,
     );
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
-    apply_action(&mut state, &Action::EndTurn, &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
+    apply_action(&mut state, &Action::EndTurn, &mut rng, &registry);
 
     // Player 0 turn 2 - can now attack
     // Attach another energy for good measure
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
 
     // Check if UseAttack is available
     let actions = legal_actions(&state);
@@ -300,7 +308,7 @@ fn test_attack_deals_damage() {
             .unwrap()
             .clone();
 
-        apply_action(&mut state, &attack_action, &mut rng);
+        apply_action(&mut state, &attack_action, &mut rng, &registry);
 
         // After attack, the turn should have ended
         // Opponent may have taken damage
@@ -376,34 +384,37 @@ fn test_weakness_bonus() {
     let deck1 = Deck::new_unchecked(cards1);
     let deck2 = Deck::new_unchecked(cards2);
     let (mut state, mut rng) = new_game(deck1, deck2, 100);
+    let registry = EffectRegistry::new();
 
     // Setup - place actives
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
     let actions = legal_actions(&state);
-    apply_action(&mut state, &actions[0].clone(), &mut rng);
-    apply_action(&mut state, &Action::ConfirmSetup, &mut rng);
+    apply_action(&mut state, &actions[0].clone(), &mut rng, &registry);
+    apply_action(&mut state, &Action::ConfirmSetup, &mut rng, &registry);
 
     // Player 0 first turn - just set energy and attach
     apply_action(
         &mut state,
         &Action::SetEnergyZoneType(EnergyType::Fire),
         &mut rng,
+        &registry,
     );
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
-    apply_action(&mut state, &Action::EndTurn, &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
+    apply_action(&mut state, &Action::EndTurn, &mut rng, &registry);
 
     // Player 1 turn - end
     apply_action(
         &mut state,
         &Action::SetEnergyZoneType(EnergyType::Grass),
         &mut rng,
+        &registry,
     );
-    apply_action(&mut state, &Action::EndTurn, &mut rng);
+    apply_action(&mut state, &Action::EndTurn, &mut rng, &registry);
 
     // Player 0 turn 2 - attack
-    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng);
+    apply_action(&mut state, &Action::AttachEnergy(0), &mut rng, &registry);
 
     let actions = legal_actions(&state);
     if let Some(attack) = actions.iter().find(|a| matches!(a, Action::UseAttack(_))) {
@@ -424,7 +435,7 @@ fn test_weakness_bonus() {
             .map(|w| w == EnergyType::Fire)
             .unwrap_or(false);
 
-        apply_action(&mut state, &attack, &mut rng);
+        apply_action(&mut state, &attack, &mut rng, &registry);
 
         if attacker_is_fire && defender_weak_to_fire {
             // 30 base + 20 weakness = 50 damage = 5 damage counters
@@ -538,6 +549,7 @@ fn test_game_with_real_cards() {
     let deck2 = Deck::new_unchecked(deck_cards);
 
     let (mut state, mut rng) = new_game(deck1, deck2, 42);
+    let registry = EffectRegistry::new();
     let mut prng = rand::rngs::StdRng::seed_from_u64(99);
 
     let mut steps = 0;
@@ -545,7 +557,7 @@ fn test_game_with_real_cards() {
         let actions = legal_actions(&state);
         if actions.is_empty() { break; }
         let idx = prng.gen_range(0..actions.len());
-        apply_action(&mut state, &actions[idx].clone(), &mut rng);
+        apply_action(&mut state, &actions[idx].clone(), &mut rng, &registry);
         steps += 1;
     }
 
