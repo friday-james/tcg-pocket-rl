@@ -1,0 +1,953 @@
+[
+  {
+    "url": "/en/card/vovbdgd95gcppnr-bulbasaur",
+    "slug": "vovbdgd95gcppnr-bulbasaur",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Tackle",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 20,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/wx7l4ow5cw3agx7-ivysaur",
+    "slug": "wx7l4ow5cw3agx7-ivysaur",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Synthesis",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 0,
+        "effect": "Take 2 Grass Energy from your Energy Zone and attach it to this Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/tq6uj96ra8yddm5-venusaur",
+    "slug": "tq6uj96ra8yddm5-venusaur",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Poisonous Whip",
+        "energy_cost": [
+          "grass",
+          "grass",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 90,
+        "effect": "Your opponent's Active Pok\u00e9mon is now Poisoned"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/gnf4sl35ncow7an-mega-venusaur-ex",
+    "slug": "gnf4sl35ncow7an-mega-venusaur-ex",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Critical Bloom",
+        "energy_cost": [
+          "grass",
+          "grass",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 120,
+        "effect": "Your opponent's Active Pok\u00e9mon is now Poisoned and Asleep"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/u9tg79utb1ih2gw-spinarak",
+    "slug": "u9tg79utb1ih2gw-spinarak",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Sting",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 20,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/o62at0a9zua1v07-ariados",
+    "slug": "o62at0a9zua1v07-ariados",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Pierce",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 30,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/ih93dveco9lfkc7-sunkern",
+    "slug": "ih93dveco9lfkc7-sunkern",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Seed Bomb",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 20,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/91si0fgxzbljg85-sunflora",
+    "slug": "91si0fgxzbljg85-sunflora",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Quick-Grow Beam",
+        "energy_cost": [
+          "grass"
+        ],
+        "damage": 30,
+        "effect": "If Quick-Grow Extract is in your discard pile, this attack does 30 more damage"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/6kwrgl9k4835nqj-burmy",
+    "slug": "6kwrgl9k4835nqj-burmy",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Hang Down",
+        "energy_cost": [
+          "colorless",
+          "colorless"
+        ],
+        "damage": 30,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/y64tf10zqf16isj-mothim",
+    "slug": "y64tf10zqf16isj-mothim",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Cutting Wind",
+        "energy_cost": [
+          "colorless",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 70,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/zvkc9ir2satck5n-charmander",
+    "slug": "zvkc9ir2satck5n-charmander",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Bite",
+        "energy_cost": [
+          "fire",
+          "colorless"
+        ],
+        "damage": 40,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/itrm24c0i5wfn8v-charmeleon",
+    "slug": "itrm24c0i5wfn8v-charmeleon",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Steady Firebreathing",
+        "energy_cost": [
+          "fire",
+          "fire",
+          "colorless"
+        ],
+        "damage": 50,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/lew2qh6a28iqm6b-charizard",
+    "slug": "lew2qh6a28iqm6b-charizard",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Inferno Onrush",
+        "energy_cost": [
+          "fire",
+          "fire",
+          "fire",
+          "colorless"
+        ],
+        "damage": 150,
+        "effect": "This Pok\u00e9mon also does 30 damage to itself"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/9u3c93opeaybnt9-mega-charizard-y-ex",
+    "slug": "9u3c93opeaybnt9-mega-charizard-y-ex",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Crimson Dive",
+        "energy_cost": [
+          "fire",
+          "fire",
+          "fire",
+          "colorless"
+        ],
+        "damage": 250,
+        "effect": "This Pok\u00e9mon also does 50 damage to itself"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/lvq4e1d6ieu959u-houndour",
+    "slug": "lvq4e1d6ieu959u-houndour",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Roar",
+        "energy_cost": [
+          "colorless"
+        ],
+        "damage": 0,
+        "effect": "Switch out your opponent's Active Pok\u00e9mon to the Bench. (Your opponent chooses the new Active Pok\u00e9mon)"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/32ncfekw0zpe2oe-houndoom",
+    "slug": "32ncfekw0zpe2oe-houndoom",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Sharp Fang",
+        "energy_cost": [
+          "fire"
+        ],
+        "damage": 50,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/evjkloatjbwc00f-squirtle",
+    "slug": "evjkloatjbwc00f-squirtle",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Tail Whap",
+        "energy_cost": [
+          "water",
+          "colorless"
+        ],
+        "damage": 40,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/rp986fbumm7pzjr-wartortle",
+    "slug": "rp986fbumm7pzjr-wartortle",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Waterfall",
+        "energy_cost": [
+          "water",
+          "water",
+          "colorless"
+        ],
+        "damage": 60,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/afite7nho9jbumu-blastoise",
+    "slug": "afite7nho9jbumu-blastoise",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Double Splash",
+        "energy_cost": [
+          "water",
+          "water",
+          "colorless"
+        ],
+        "damage": 90,
+        "effect": "If this Pok\u00e9mon has at least 2 extra Water Energy attached, this attack does 50 damage to 1 of your opponent's Benched Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/k7rxky048kvsvak-mega-blastoise-ex",
+    "slug": "k7rxky048kvsvak-mega-blastoise-ex",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Triple Bombardment",
+        "energy_cost": [
+          "water",
+          "water",
+          "colorless"
+        ],
+        "damage": 130,
+        "effect": "If this Pok\u00e9mon has at least 3 extra Water Energy attached, this attack does 50 damage to 2 of your opponent's Benched Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/95t2qc3ac1z2mod-basculin",
+    "slug": "95t2qc3ac1z2mod-basculin",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Surprise Strike",
+        "energy_cost": [
+          "water",
+          "colorless"
+        ],
+        "damage": 40,
+        "effect": "If this Pok\u00e9mon moved from your Bench to the Active Spot this turn, this attack does 40 more damage"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/r8w6ieaf2fcktl1-clauncher",
+    "slug": "r8w6ieaf2fcktl1-clauncher",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Water Gun",
+        "energy_cost": [
+          "water"
+        ],
+        "damage": 20,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/uku5ed2kt3uj1ep-clawitzer",
+    "slug": "uku5ed2kt3uj1ep-clawitzer",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Aqua Shower",
+        "energy_cost": [
+          "water"
+        ],
+        "damage": 0,
+        "effect": "This attack does 20 damage to each of your opponent's Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/8ncjzu3mrmp1nyk-magnemite",
+    "slug": "8ncjzu3mrmp1nyk-magnemite",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Electro Ball",
+        "energy_cost": [
+          "lightning"
+        ],
+        "damage": 30,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/opudiih4bakn44t-magneton",
+    "slug": "opudiih4bakn44t-magneton",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Spark",
+        "energy_cost": [
+          "lightning"
+        ],
+        "damage": 20,
+        "effect": "This attack also does 20 damage to 1 of your opponent's Benched Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/zcsfydaqufso90s-magnezone",
+    "slug": "zcsfydaqufso90s-magnezone",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Mirror Shot",
+        "energy_cost": [
+          "lightning",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 90,
+        "effect": "During your opponent's next turn, if the Defending Pok\u00e9mon tries to use an attack, your opponent flips a coin. If tails, that attack doesn't happen"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/q3r1qntm2da42jo-emolga",
+    "slug": "q3r1qntm2da42jo-emolga",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Mach Bolt",
+        "energy_cost": [
+          "lightning",
+          "colorless"
+        ],
+        "damage": 50,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/tcp29tvhzkoeolp-helioptile",
+    "slug": "tcp29tvhzkoeolp-helioptile",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Thunder Shock",
+        "energy_cost": [
+          "lightning"
+        ],
+        "damage": 10,
+        "effect": "Flip a coin. If heads, your opponent's Active Pok\u00e9mon is now Paralyzed"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/rxosv68xrvpt5o6-heliolisk",
+    "slug": "rxosv68xrvpt5o6-heliolisk",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Thunderbolt",
+        "energy_cost": [
+          "lightning",
+          "lightning"
+        ],
+        "damage": 120,
+        "effect": "Discard all Energy from this Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/nj6cwie5wu1uwjd-misdreavus",
+    "slug": "nj6cwie5wu1uwjd-misdreavus",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Lead",
+        "energy_cost": [
+          "psychic"
+        ],
+        "damage": 0,
+        "effect": "Put a random Supporter card from your deck into your hand"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/1k2kav7potcqkan-mismagius",
+    "slug": "1k2kav7potcqkan-mismagius",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Stored Power",
+        "energy_cost": [
+          "psychic",
+          "psychic"
+        ],
+        "damage": 60,
+        "effect": "Move all Psychic Enegy from this Pok\u00e9mon to 1 of your Benched Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/ftypxp21cgm5r4v-solosis",
+    "slug": "ftypxp21cgm5r4v-solosis",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Rollout",
+        "energy_cost": [
+          "psychic"
+        ],
+        "damage": 20,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/loyaddtvgs69vf6-duosion",
+    "slug": "loyaddtvgs69vf6-duosion",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Psyshot",
+        "energy_cost": [
+          "psychic",
+          "colorless"
+        ],
+        "damage": 50,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/wrdt6swf28cdc4b-reuniclus",
+    "slug": "wrdt6swf28cdc4b-reuniclus",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Psypunch",
+        "energy_cost": [
+          "colorless",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 90,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/zxkflptc0wxjbcr-spritzee",
+    "slug": "zxkflptc0wxjbcr-spritzee",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Sweet Scent",
+        "energy_cost": [
+          "psychic"
+        ],
+        "damage": 0,
+        "effect": "Heal 20 damage from 1 of your Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/ok1qy2ewsrrhqek-aromatisse",
+    "slug": "ok1qy2ewsrrhqek-aromatisse",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Perfume Blast",
+        "energy_cost": [
+          "psychic",
+          "colorless"
+        ],
+        "damage": 60,
+        "effect": "During your opponent's next turn, attacks used by the Defending Pok\u00e9mon cost 1 Colorless more"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/sjjoy187ad7kc10-xerneas",
+    "slug": "sjjoy187ad7kc10-xerneas",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Geoburst",
+        "energy_cost": [
+          "psychic",
+          "psychic",
+          "colorless"
+        ],
+        "damage": 120,
+        "effect": "This attack's damage is reduced by the amount of damage this Pok\u00e9mon has on it"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/k9ynlyvl61nqj14-onix",
+    "slug": "k9ynlyvl61nqj14-onix",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Dig",
+        "energy_cost": [
+          "colorless",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 30,
+        "effect": "Flip a coin. If heads, uring your opponent's next turn, prevent all damage from-and effects of-attacks done to this Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/7dctp811p5t2tfw-makuhita",
+    "slug": "7dctp811p5t2tfw-makuhita",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Strength",
+        "energy_cost": [
+          "fighting",
+          "fighting"
+        ],
+        "damage": 40,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/d9zv8bpjyfq8oln-hariyama",
+    "slug": "d9zv8bpjyfq8oln-hariyama",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Megaton Slap Push",
+        "energy_cost": [
+          "fighting",
+          "fighting",
+          "fighting"
+        ],
+        "damage": 90,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/juqbu9t6b79rjof-nosepass",
+    "slug": "juqbu9t6b79rjof-nosepass",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Rising Lunge",
+        "energy_cost": [
+          "colorless",
+          "colorless",
+          "colorless"
+        ],
+        "damage": 10,
+        "effect": "Flip a coin. If heads, this attack does 20 more damage"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/8bw6n69qcgr0awj-mega-lopunny-ex",
+    "slug": "8bw6n69qcgr0awj-mega-lopunny-ex",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Rapid Smashers",
+        "energy_cost": [
+          "fighting",
+          "fighting"
+        ],
+        "damage": 90,
+        "effect": "Flip 2 coins. This attack does 90 damage for each heads. Your opponent's Active Pok\u00e9mon is now Confused."
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/eebtp2j2d1w3nku-mienfoo",
+    "slug": "eebtp2j2d1w3nku-mienfoo",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Chop",
+        "energy_cost": [
+          "fighting"
+        ],
+        "damage": 30,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/80gfdyv2j3fb4sk-mienshao",
+    "slug": "80gfdyv2j3fb4sk-mienshao",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Low Sweep",
+        "energy_cost": [
+          "fighting"
+        ],
+        "damage": 50,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/9hmg1c2w3i85hnp-grimer",
+    "slug": "9hmg1c2w3i85hnp-grimer",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Sludge Bomb",
+        "energy_cost": [
+          "darkness",
+          "darkness"
+        ],
+        "damage": 40,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/iholnhjq5j1kiak-muk",
+    "slug": "iholnhjq5j1kiak-muk",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Gunk Shot",
+        "energy_cost": [
+          "darkness",
+          "darkness",
+          "darkness"
+        ],
+        "damage": 70,
+        "effect": "Your opponent's ActiveP ok\u00e9mon is now Poisoned"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/qr64jcs9qeeysz3-purrloin",
+    "slug": "qr64jcs9qeeysz3-purrloin",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Trip Over",
+        "energy_cost": [
+          "darkness"
+        ],
+        "damage": 10,
+        "effect": "Flip a coin. If heads, this attack does 30 more damage"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/cre549a18e7oyph-liepard",
+    "slug": "cre549a18e7oyph-liepard",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Snatch and Flee",
+        "energy_cost": [
+          "darkness"
+        ],
+        "damage": 60,
+        "effect": "Your opponent reveals a random card from their hand and shuffles it into their deck. Shuffle this Pok\u00e9mon into your deck."
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/m9zxo834h4bbftp-trubbish",
+    "slug": "m9zxo834h4bbftp-trubbish",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Drool",
+        "energy_cost": [
+          "darkness",
+          "colorless"
+        ],
+        "damage": 30,
+        "effect": null
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  },
+  {
+    "url": "/en/card/s4w2f49vc85jzk5-garbodor",
+    "slug": "s4w2f49vc85jzk5-garbodor",
+    "card_type": "pokemon",
+    "attacks": [
+      {
+        "name": "Acid Spray",
+        "energy_cost": [
+          "darkness",
+          "darkness",
+          "colorless"
+        ],
+        "damage": 70,
+        "effect": "Flip a coin. If heads, discard a random Energy from your opponent's Active Pok\u00e9mon"
+      }
+    ],
+    "ability": null,
+    "is_ex": false,
+    "evolves_from": null
+  }
+]

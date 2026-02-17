@@ -1,0 +1,33 @@
+# Rust
+engine/target/
+**/*.rs.bk
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+*.so
+
+# Data (large files - download via script)
+data/cards.json
+data/cards_extra.json
+data/cards_merged.json
+data/card_urls.json
+data/cards_failed.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ML artifacts
+checkpoints/
+runs/
+*.pt
+*.pth
+tensorboard/
