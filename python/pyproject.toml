@@ -1,0 +1,26 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "tcg-pocket-rl"
+version = "0.1.0"
+description = "Pokemon TCG Pocket RL - Reinforcement learning for optimal gameplay and deck building"
+requires-python = ">=3.10"
+dependencies = [
+    "gymnasium>=0.29",
+    "numpy>=1.24",
+    "sb3-contrib>=2.3",
+    "stable-baselines3>=2.3",
+    "torch>=2.0",
+    "tensorboard>=2.14",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.maturin]
+manifest-path = "../engine/Cargo.toml"
+features = ["python"]
+python-source = "src"
+module-name = "tcg_pocket_engine"
