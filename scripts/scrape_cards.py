@@ -23,13 +23,25 @@ def parse_card_from_rsc(rsc_text: str, card_url: str) -> dict:
     card = {"url": card_url, "slug": card_url.split("/")[-1]}
 
     # --- Extract schema.org JSON-LD Product data ---
-    schema_match = re.search(
-        r'\{"@context":"https://schema\.org","@type":\["Product","CreativeWork"\].*?\}',
-        rsc_text,
-    )
-    if schema_match:
+    # The JSON has nested objects, so we can't use .*? - find start and parse with brace counting
+    schema_start = rsc_text.find('{"@context":"https://schema.org","@type":["Product","CreativeWork"]')
+    schema = None
+    if schema_start >= 0:
+        # Find the matching closing brace
+        depth = 0
+        for i in range(schema_start, min(schema_start + 5000, len(rsc_text))):
+            if rsc_text[i] == '{':
+                depth += 1
+            elif rsc_text[i] == '}':
+                depth -= 1
+                if depth == 0:
+                    try:
+                        schema = json.loads(rsc_text[schema_start:i+1])
+                    except json.JSONDecodeError:
+                        pass
+                    break
+    if schema:
         try:
-            schema = json.loads(schema_match.group())
             name = schema.get("name", "")
             name_match = re.match(r"(.+?)\s*\(", name)
             card["name"] = name_match.group(1).strip() if name_match else name
