@@ -273,6 +273,17 @@ pub struct GameState {
     pub first_turn: bool,
     /// Pending effect choices (for effects that require player decisions).
     pub pending_choice: Option<PendingChoice>,
+    /// Deferred turn end: set when a KO promotion choice interrupts end_turn flow.
+    pub deferred_turn_end: Option<DeferredTurnEnd>,
+}
+
+/// Tracks deferred turn-ending after a KO promotion choice.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum DeferredTurnEnd {
+    /// After attack KO: need full end_turn (between-turns + switch) for this player.
+    NeedFullEndTurn(usize),
+    /// After between-turns KO: just need turn switch (between-turns already ran).
+    NeedTurnSwitch(usize),
 }
 
 /// A pending choice the current player must resolve.

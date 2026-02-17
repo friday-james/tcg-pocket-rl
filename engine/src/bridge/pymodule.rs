@@ -163,6 +163,13 @@ impl PyGameEngine {
             .map(|s| encode_observation(s, self.agent_player))
     }
 
+    /// Get the observation vector from a specific player's perspective.
+    fn observation_for(&self, player: usize) -> PyResult<Vec<f32>> {
+        self.state.as_ref()
+            .ok_or_else(|| PyValueError::new_err("Game not initialized"))
+            .map(|s| encode_observation(s, player))
+    }
+
     /// Get number of cards in the database.
     fn num_cards(&self) -> usize {
         self.db.cards.len()

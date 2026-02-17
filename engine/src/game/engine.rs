@@ -30,6 +30,7 @@ pub fn new_game(deck1: Deck, deck2: Deck, seed: u64) -> (GameState, GameRng) {
         winner: None,
         first_turn: true,
         pending_choice: None,
+        deferred_turn_end: None,
     };
 
     // Shuffle and deal for both players
@@ -84,7 +85,7 @@ pub fn apply_action(
     match state.phase {
         TurnPhase::Setup => apply_setup_action(state, action, rng),
         TurnPhase::Main => apply_main_action(state, action, rng, registry),
-        TurnPhase::EffectChoice => apply_effect_choice(state, action, rng),
+        TurnPhase::EffectChoice => apply_effect_choice(state, action, rng, registry),
         _ => StepResult::InvalidAction(format!("Cannot act in phase {:?}", state.phase)),
     }
 }
@@ -318,7 +319,12 @@ fn apply_main_action(
     }
 }
 
-fn apply_effect_choice(state: &mut GameState, action: &Action, _rng: &mut GameRng) -> StepResult {
+fn apply_effect_choice(
+    state: &mut GameState,
+    action: &Action,
+    rng: &mut GameRng,
+    registry: &EffectRegistry,
+) -> StepResult {
     match (&state.pending_choice, action) {
         (Some(PendingChoice::PromoteFromBench), Action::PromotePokemon(bench_idx)) => {
             let player = state.current_mut();
@@ -327,9 +333,32 @@ fn apply_effect_choice(state: &mut GameState, action: &Action, _rng: &mut GameRn
                 player.active = pokemon;
             }
             state.pending_choice = None;
-            // Continue with whatever phase we were in
+
+            // Complete deferred turn end if set
+            match state.deferred_turn_end.take() {
+                Some(DeferredTurnEnd::NeedFullEndTurn(player_idx)) => {
+                    // After attack KO: restore current_player to attacker, run full end_turn
+                    state.current_player = player_idx;
+                    end_turn(state, rng, registry);
+                }
+                Some(DeferredTurnEnd::NeedTurnSwitch(player_idx)) => {
+                    // After between-turns KO: just switch turns (between-turns already ran)
+                    state.current_player = player_idx;
+                    complete_turn_switch(state);
+                }
+                None => {
+                    // No deferred turn end, restore to Main phase
+                    state.phase = TurnPhase::Main;
+                }
+            }
+
             check_win_conditions(state);
-            StepResult::Continue
+
+            if let Some(winner) = state.winner {
+                StepResult::GameOver { winner }
+            } else {
+                StepResult::Continue
+            }
         }
         _ => StepResult::InvalidAction(format!(
             "Invalid effect choice: {:?} for {:?}",
@@ -487,6 +516,27 @@ fn resolve_attack(
         handle_knockout(state, opponent_idx, registry);
     }
 
+    // Check if attacker was KO'd (e.g., by retaliation damage from Rocky Helmet)
+    let attacker_ko = state.players[current_player]
+        .active
+        .as_ref()
+        .map_or(false, |p| p.is_knocked_out());
+
+    if attacker_ko {
+        handle_knockout(state, current_player, registry);
+    }
+
+    // If a pending promotion choice was set, defer end_turn
+    if state.pending_choice.is_some() {
+        state.deferred_turn_end = Some(DeferredTurnEnd::NeedFullEndTurn(current_player));
+        check_win_conditions(state);
+        return if let Some(winner) = state.winner {
+            StepResult::GameOver { winner }
+        } else {
+            StepResult::Continue
+        };
+    }
+
     // End the turn
     end_turn(state, rng, registry);
 
@@ -602,6 +652,17 @@ fn end_turn(state: &mut GameState, rng: &mut GameRng, registry: &EffectRegistry)
     // Resolve between-turns effects
     resolve_between_turns(state, rng, registry);
 
+    // If between-turns effects triggered a KO promotion choice, defer turn switch
+    if state.pending_choice.is_some() {
+        state.deferred_turn_end = Some(DeferredTurnEnd::NeedTurnSwitch(state.current_player));
+        return;
+    }
+
+    complete_turn_switch(state);
+}
+
+/// Complete the turn switch: advance to next player, draw, set Main phase.
+fn complete_turn_switch(state: &mut GameState) {
     // Switch to next player
     state.current_player = 1 - state.current_player;
     state.turn_number += 1;

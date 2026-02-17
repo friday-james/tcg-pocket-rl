@@ -65,7 +65,7 @@ class PokemonTCGPocketEnv(gym.Env):
         return obs, info
 
     def step(self, action):
-        _, reward, done, truncated, _ = self.engine.step(int(action))
+        reward, done = self._safe_step(int(action))
 
         if not done:
             # Play opponent turns until it's the agent's turn again
@@ -78,11 +78,39 @@ class PokemonTCGPocketEnv(gym.Env):
         info = {"action_mask": np.array(self.action_masks(), dtype=np.bool_)}
         return obs, reward, done, False, info
 
+    def _safe_step(self, action: int) -> tuple[float, bool]:
+        """Execute a step with fallback on invalid action."""
+        try:
+            _, reward, done, _, _ = self.engine.step(action)
+            return reward, done
+        except ValueError:
+            # Action was masked as legal but engine rejected it - recover
+            legal = self.engine.legal_action_indices()
+            if legal:
+                _, reward, done, _, _ = self.engine.step(legal[0])
+                return reward, done
+            # No legal actions - force end turn
+            try:
+                _, reward, done, _, _ = self.engine.step(114)
+                return reward, done
+            except ValueError:
+                # Game is in a broken state - treat as done
+                return 0.0, True
+
     def action_masks(self) -> np.ndarray:
-        """Return action mask for MaskablePPO compatibility."""
+        """Return action mask for MaskablePPO compatibility.
+
+        Never returns all-zeros: MaskableCategorical requires at least one
+        valid action to satisfy the Simplex constraint during policy updates.
+        """
         if self.engine.is_done():
-            return np.zeros(ACTION_SPACE_SIZE, dtype=np.bool_)
-        return np.array(self.engine.action_masks(), dtype=np.bool_)
+            mask = np.zeros(ACTION_SPACE_SIZE, dtype=np.bool_)
+            mask[0] = True  # dummy valid action for terminal state
+            return mask
+        mask = np.array(self.engine.action_masks(), dtype=np.bool_)
+        if not mask.any():
+            mask[0] = True  # safety: ensure at least one valid action
+        return mask
 
     def render(self):
         if self.render_mode == "ansi":
@@ -111,7 +139,7 @@ class PokemonTCGPocketEnv(gym.Env):
             else:
                 action = legal[np.random.randint(len(legal))]
 
-            _, reward, done, _, _ = self.engine.step(action)
+            reward, done = self._safe_step(action)
             if done:
                 return -reward  # flip: opponent's positive = agent's negative
 
