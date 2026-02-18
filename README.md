@@ -79,6 +79,61 @@ Win counts out of 50 games (row vs column):
 - **Pikachu ex Aggro** dominates Charizard ex (58%) and Gyarados ex (56%)
 - The meta is well-balanced: all decks fall within 47-53%, no dominant outlier
 
+## Optimized Counter-Deck: Fighting Blissey ex (68.3%)
+
+A genetic algorithm evolved this deck over 30 generations to beat all 12 meta decks. Fitness is measured by agent-vs-agent win rate (trained model plays both sides). Energy Zone constraint enforced: all attack costs use Fighting + Colorless only.
+
+### Decklist (Energy Zone: Fighting)
+
+**Pokemon (8):**
+
+| Qty | Card | HP | Attack | Cost | Dmg | Effect |
+|-----|------|----|--------|------|-----|--------|
+| 1x | Blissey ex | 180 | Happy Punch | CCCC | 100 | Flip heads: heal 60 |
+| 1x | Larvitar | 60 | Corkscrew Punch | FC | 30 | — |
+| 1x | Pupitar | 80 | Guard Press | CCC | 20 | -30 dmg next turn |
+| 1x | Geodude | 70 | Tackle | F | 20 | — |
+| 1x | Farfetch'd | 60 | Leek Slap | C | 40 | — |
+| 1x | Eevee | 60 | Tail Whap | CC | 30 | — |
+| 1x | Leafeon | 90 | Leaf Blast | C | 10+ | +20 per Grass Energy |
+| 1x | Pineco | 60 | Ram | CC | 30 | — |
+
+**Trainers (12):**
+
+| Qty | Card | Type | Effect |
+|-----|------|------|--------|
+| 1x | Iono | Supporter | Both players shuffle hand, draw same count |
+| 1x | Mars | Supporter | Opponent draws cards = remaining prize points |
+| 1x | Leaf | Supporter | Retreat cost -2 this turn |
+| 1x | Celestic Town Elder | Supporter | Recover random Basic from discard |
+| 1x | Pokemon Flute | Item | Put Basic from opponent's discard onto their bench |
+| 1x | Eevee Bag | Item | Eevee evo +10 dmg or heal 20 |
+| 1x | Elemental Switch | Item | Move Fire/Water Energy bench to active |
+| 1x | Sitrus Berry | Tool | Heal 30 at half HP, discard |
+| 1x | Lusamine | Supporter | Attach 2 Energy from discard to Ultra Beast |
+| 1x | Mallow | Supporter | Full heal Shiinotic/Tsareena, discard energy |
+| 1x | Kiawe | Supporter | Attach 2 Fire Energy to Marowak/Turtonator |
+| 1x | Team Rocket Grunt | Supporter | Disruption |
+
+### Matchups vs Meta
+
+| Opponent | Win Rate |
+|----------|----------|
+| Mew Mewtwo | **100%** |
+| Mewtwo ex Control | **80%** |
+| Buzzwole Lucario | **80%** |
+| Suicune Greninja | 70% |
+| Starmie ex | 70% |
+| Darkrai Hydreigon | 70% |
+| Dialga Palkia | 70% |
+| Charizard ex | 60% |
+| Celebi Exeggutor | 60% |
+| Gyarados ex | 60% |
+| Pikachu ex Aggro | 50% |
+| Mega Altaria | 50% |
+
+No losing matchups. The deck's core strategy: **Blissey ex** (180HP, 100 dmg + coin-flip heal) as a tanky primary attacker, backed by disruption supporters and cheap colorless attackers for early pressure.
+
 ## Training
 
 ```bash
@@ -96,6 +151,9 @@ python scripts/train_meta.py 2000000 8 checkpoints/ppo_meta_655360
 
 # Agent-vs-agent evaluation
 python scripts/eval_agent_vs_agent.py checkpoints/ppo_meta_final 50
+
+# Evolve a counter-deck (30 generations, population 50)
+python scripts/optimize_counter_deck.py checkpoints/ppo_meta_final 30 50
 ```
 
 ## Meta Decks (February 2026)
